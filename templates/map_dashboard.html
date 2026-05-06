@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crime Risk Heatmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0f1e; --surface: #111827; --surface2: #1a2235;
+  --border: rgba(255,255,255,0.07); --text: #f0f4ff; --muted: #7a8aaa;
+  --accent-b: #3b82f6; --accent-r: #ff3b5c;
+  --radius: 12px; --radius-lg: 18px;
+  --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+}
+html, body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; margin: 0; }
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+  background: rgba(10,15,30,0.95); backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 1000;
+}
+.brand { font-family: var(--font-head); font-weight: 800; font-size: 1.05rem; }
+.brand span { color: var(--accent-b); }
+.back-link { font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+.back-link:hover { color: var(--text); }
+
+.page { padding: 1.5rem 2rem 2rem; max-width: 1200px; margin: 0 auto; }
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;
+}
+h1 { font-family: var(--font-head); font-size: 1.5rem; font-weight: 800; }
+.status-pill {
+  font-size: 12px; padding: 5px 14px; border-radius: 100px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+}
+.status-pill.loaded { color: #4ade80; border-color: rgba(34,197,94,0.2); background: rgba(34,197,94,0.06); }
+
+/* LEGEND */
+.legend {
+  display: flex; gap: 16px; margin-bottom: 1rem; flex-wrap: wrap;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+#map {
+  height: 620px; width: 100%;
+  border-radius: var(--radius-lg); overflow: hidden;
+  border: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">🌍 Tourist<span>Safe</span></div>
+  <a href="/" class="back-link">← Home</a>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>🗺️ AI Tourist Safety Heatmap</h1>
+    <div class="status-pill" id="status">Loading dataset…</div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#ff3b5c;"></div>High Risk</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f97316;"></div>Medium Risk</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#22c55e;"></div>Low Risk</div>
+  </div>
+
+  <div id="map"></div>
+</div>
+
+<script>
+var map = L.map('map').setView([22.9734,78.6569],5);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  maxZoom:19
+}).addTo(map);
+
+fetch("/crime-heatmap/")
+  .then(response => response.json())
+  .then(data => {
+    console.log("Dataset received:", data);
+
+    var statusEl = document.getElementById("status");
+    statusEl.textContent = data.length + " data points loaded";
+    statusEl.className = 'status-pill loaded';
+
+    let heatPoints = [];
+
+    data.forEach(point => {
+      if(point.lat && point.lng){
+        let intensity = 0.5;
+        if(point.risk === "High") intensity = 1;
+        else if(point.risk === "Medium") intensity = 0.7;
+        else intensity = 0.3;
+
+        heatPoints.push([
+          parseFloat(point.lat),
+          parseFloat(point.lng),
+          intensity
+        ]);
+      }
+    });
+
+    console.log("Heat points:", heatPoints.length);
+
+    L.heatLayer(heatPoints,{
+      radius:25,
+      blur:20,
+      maxZoom:10
+    }).addTo(map);
+  })
+  .catch(error => {
+    console.error("Error loading heatmap:", error);
+    document.getElementById("status").textContent = "Error loading dataset";
+  });
+</script>
+</body>
+</html>

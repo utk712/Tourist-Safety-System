@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nearest Police Stations</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0f1e; --surface: #111827; --surface2: #1a2235;
+  --border: rgba(255,255,255,0.07); --text: #f0f4ff; --muted: #7a8aaa;
+  --accent-b: #3b82f6; --accent-g: #22c55e;
+  --radius: 12px; --radius-lg: 18px;
+  --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+}
+html, body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; margin: 0; }
+
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+  background: rgba(10,15,30,0.95); backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 1000;
+}
+
+.brand { font-family: var(--font-head); font-weight: 800; font-size: 1.05rem; }
+.brand span { color: var(--accent-b); }
+
+.back-link { font-size: 13px; color: var(--muted); text-decoration: none; }
+.back-link:hover { color: var(--text); }
+
+.page { padding: 1.5rem 2rem 2rem; max-width: 1200px; margin: 0 auto; }
+
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;
+}
+
+h1 { font-family: var(--font-head); font-size: 1.5rem; font-weight: 800; }
+
+.status-pill {
+  font-size: 12px; padding: 5px 14px; border-radius: 100px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+  display: flex; align-items: center; gap: 6px;
+}
+
+.status-pill.found {
+  color: #4ade80;
+  border-color: rgba(34,197,94,0.2);
+  background: rgba(34,197,94,0.06);
+}
+
+.spinner {
+  width: 8px; height: 8px;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-top-color: var(--accent-b);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#map {
+  height: 600px;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <div class="brand">🌍 Tourist<span>Safe</span></div>
+  <a href="/" class="back-link">← Home</a>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>🚔 Find Nearest Police Stations</h1>
+    <div class="status-pill" id="status">
+      <span class="spinner" id="spinner"></span>
+      <span id="statusText">Detecting your location…</span>
+    </div>
+  </div>
+  <div id="map"></div>
+</div>
+
+<script>
+// 🔥 MAP INIT
+var map = L.map('map').setView([22.9734, 78.6569], 5);
+
+// 🔥 TILE SERVER FALLBACK SYSTEM (PERMANENT FIX)
+const tileServers = [
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+  'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
+];
+
+let currentIndex = 0;
+let tileLayer;
+
+function loadTileLayer(index) {
+  if (tileLayer) map.removeLayer(tileLayer);
+
+  tileLayer = L.tileLayer(tileServers[index], { maxZoom: 19 });
+
+  tileLayer.on('tileerror', function () {
+    currentIndex++;
+    if (currentIndex < tileServers.length) {
+      loadTileLayer(currentIndex);
+    } else {
+      document.getElementById("statusText").textContent =
+        "⚠ Map failed. Check internet or firewall.";
+    }
+  });
+
+  tileLayer.addTo(map);
+}
+
+loadTileLayer(0);
+
+// ===============================
+// LOCATION + POLICE FETCH
+// ===============================
+
+var userMarker;
+
+function showLocation(position){
+  var lat = position.coords.latitude;
+  var lon = position.coords.longitude;
+
+  document.getElementById("statusText").textContent =
+    "Your Location: " + lat.toFixed(5) + ", " + lon.toFixed(5);
+
+  document.getElementById("spinner").style.display = "none";
+
+  userMarker = L.marker([lat, lon])
+    .addTo(map)
+    .bindPopup("📍 You are here")
+    .openPopup();
+
+  map.setView([lat, lon], 14);
+
+  // 🔥 Django API call
+  fetch(`/nearest-police-data/?lat=${lat}&lng=${lon}`)
+    .then(response => response.json())
+    .then(data => {
+
+      var statusEl = document.getElementById('status');
+
+      if (data.error) {
+        statusEl.className = 'status-pill';
+        statusEl.innerHTML = "⚠ " + data.error;
+        return;
+      }
+
+      if (!data.length) {
+        statusEl.className = 'status-pill';
+        statusEl.innerHTML = "⚠ No police stations found nearby";
+        return;
+      }
+
+      var count = data.length;
+
+      statusEl.className = 'status-pill found';
+      statusEl.innerHTML =
+        '🚔 ' + count + ' police station' + (count !== 1 ? 's' : '') + ' nearby';
+
+      data.forEach(function(place){
+        L.marker([place.lat, place.lng])
+          .addTo(map)
+          .bindPopup("🚔 " + place.name);
+      });
+    })
+    .catch(function() {
+      document.getElementById("statusText").textContent =
+        "⚠ Failed to load police data.";
+    });
+}
+
+function showError(){
+  document.getElementById("spinner").style.display = "none";
+  document.getElementById("statusText").textContent =
+    "⚠ Please allow location access.";
+}
+
+if(navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(
+    showLocation,
+    showError,
+    { enableHighAccuracy:true, timeout:10000 }
+  );
+} else {
+  alert("Geolocation not supported");
+}
+</script>
+
+</body>
+</html>

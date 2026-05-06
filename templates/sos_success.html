@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOS Alert Sent</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0f1e; --surface: #111827; --surface2: #1a2235;
+  --border: rgba(255,255,255,0.07); --text: #f0f4ff; --muted: #7a8aaa;
+  --accent-r: #ff3b5c; --accent-b: #3b82f6;
+  --radius: 12px; --radius-lg: 18px;
+  --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+}
+html, body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; display: flex; flex-direction: column; }
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+  background: rgba(10,15,30,0.9);
+}
+.brand { font-family: var(--font-head); font-weight: 800; font-size: 1.05rem; }
+.brand span { color: var(--accent-b); }
+.center { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+.box { text-align: center; max-width: 440px; }
+.alert-icon {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,59,92,0.12); border: 2px solid rgba(255,59,92,0.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px; margin: 0 auto 1.5rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,59,92,0.3); }
+  50% { box-shadow: 0 0 0 16px rgba(255,59,92,0); }
+}
+h1 { font-family: var(--font-head); font-size: 1.9rem; font-weight: 800; margin-bottom: 0.75rem; }
+.status-bar {
+  background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2);
+  border-radius: var(--radius); padding: 12px 16px; margin-bottom: 1.5rem;
+  font-size: 13px; color: #4ade80;
+}
+p { color: var(--muted); font-size: 14px; line-height: 1.65; margin-bottom: 2rem; }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 11px 22px; border-radius: var(--radius);
+  background: var(--surface2); color: var(--text);
+  border: 1px solid rgba(255,255,255,0.13); font-family: var(--font-body);
+  font-size: 14px; text-decoration: none; transition: background 0.2s;
+}
+.btn:hover { background: #222e45; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">🌍 Tourist<span>Safe</span></div>
+</nav>
+<div class="center">
+  <div class="box">
+    <div class="alert-icon">🚨</div>
+    <h1>SOS Alert Sent!</h1>
+    <div class="status-bar">✔ Your location has been transmitted to emergency services</div>
+    <p>Stay calm. Authorities have received your alert and your GPS coordinates. Help is being dispatched to your location.</p>
+    <a href="/" class="btn">← Go Back Home</a>
+  </div>
+</div>
+</body>
+</html>

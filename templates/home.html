@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tourist Safety System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0f1e; --surface: #111827; --surface2: #1a2235;
+  --border: rgba(255,255,255,0.07); --border-md: rgba(255,255,255,0.13);
+  --text: #f0f4ff; --muted: #7a8aaa;
+  --accent-r: #ff3b5c; --accent-b: #3b82f6; --accent-g: #22c55e;
+  --accent-y: #f59e0b; --accent-t: #06b6d4; --accent-o: #f97316;
+  --radius: 12px; --radius-lg: 18px;
+  --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+}
+html, body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; }
+
+/* NAV */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+  background: rgba(10,15,30,0.9); backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 100;
+}
+.brand { font-family: var(--font-head); font-weight: 800; font-size: 1.05rem; letter-spacing: 0.02em; }
+.brand span { color: var(--accent-b); }
+.nav-badge { font-size: 11px; background: rgba(34,197,94,0.15); color: #4ade80; padding: 3px 10px; border-radius: 100px; letter-spacing: 0.05em; }
+
+/* HERO */
+.hero {
+  padding: 5rem 2rem 3.5rem;
+  text-align: center;
+  max-width: 760px; margin: 0 auto;
+  position: relative;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent-t); margin-bottom: 1.5rem;
+  background: rgba(6,182,212,0.1); padding: 4px 14px; border-radius: 100px;
+  border: 1px solid rgba(6,182,212,0.2);
+}
+h1 {
+  font-family: var(--font-head); font-size: clamp(2.2rem, 5vw, 3.2rem);
+  font-weight: 800; line-height: 1.1; margin-bottom: 1.25rem;
+}
+h1 .grad { background: linear-gradient(135deg, var(--accent-b), var(--accent-t)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-sub { color: var(--muted); font-size: 1rem; max-width: 500px; margin: 0 auto 2.5rem; line-height: 1.7; }
+
+/* GRID */
+.actions { padding: 0 2rem 2rem; max-width: 1100px; margin: 0 auto; }
+.section-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--muted); margin-bottom: 0.85rem; font-weight: 500;
+}
+.grid { display: grid; gap: 14px; margin-bottom: 1.75rem; }
+.grid-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+/* CARDS */
+.action-card {
+  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.5rem 1.25rem;
+  text-decoration: none; color: var(--text);
+  transition: border-color 0.2s, transform 0.2s, background 0.2s;
+  position: relative; overflow: hidden;
+}
+.action-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 80% 20%, var(--card-color, transparent) 0%, transparent 65%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.action-card:hover { border-color: var(--border-md); transform: translateY(-2px); }
+.action-card:hover::before { opacity: 0.07; }
+.card-icon {
+  width: 42px; height: 42px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 1rem;
+  background: var(--icon-bg, rgba(59,130,246,0.12));
+  flex-shrink: 0;
+}
+.card-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+.card-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.card-arr {
+  display: inline-block; margin-top: auto; padding-top: 1rem;
+  font-size: 18px; color: var(--muted); transition: color 0.2s, transform 0.2s;
+}
+.action-card:hover .card-arr { color: var(--text); transform: translate(2px, -2px); }
+
+/* SOS CARD SPECIAL */
+.action-card.sos-card {
+  background: linear-gradient(135deg, rgba(255,59,92,0.08) 0%, var(--surface) 60%);
+  border-color: rgba(255,59,92,0.2);
+}
+.action-card.sos-card:hover { border-color: rgba(255,59,92,0.45); }
+
+/* FOOTER */
+footer {
+  text-align: center; padding: 2rem; font-size: 13px;
+  color: var(--muted); border-top: 1px solid var(--border); margin-top: 2rem;
+}
+.admin-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--muted); text-decoration: none;
+  padding: 7px 16px; border: 1px solid var(--border);
+  border-radius: 8px; transition: border-color 0.2s, color 0.2s;
+}
+.admin-link:hover { border-color: var(--border-md); color: var(--text); }
+
+/* DIVIDER */
+.divider { height: 1px; background: var(--border); margin: 0.5rem 0 1.5rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">🌍 Tourist<span>Safe</span></div>
+  <div class="nav-badge">● Live</div>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">AI-Powered Safety Platform</div>
+  <h1>Smart Tourist Safety<br><span class="grad">Monitoring System</span></h1>
+  <p class="hero-sub">Real-time incident tracking, emergency response, and risk intelligence for safer travel experiences.</p>
+</div>
+
+<div class="actions">
+
+  <p class="section-label">Core Services</p>
+  <div class="grid grid-4">
+    <a href="/register/" class="action-card" style="--icon-bg: rgba(59,130,246,0.12); --card-color: #3b82f6;">
+      <div class="card-icon">🗂️</div>
+      <div class="card-name">Tourist Registration</div>
+      <div class="card-desc">Register travellers and manage visitor records securely.</div>
+      <span class="card-arr">↗</span>
+    </a>
+    <a href="/sos/" class="action-card sos-card" style="--icon-bg: rgba(255,59,92,0.14);">
+      <div class="card-icon">🚨</div>
+      <div class="card-name">Emergency SOS</div>
+      <div class="card-desc">Send an instant SOS alert with your live GPS location.</div>
+      <span class="card-arr" style="color: var(--accent-r);">↗</span>
+    </a>
+    <a href="/incidents/" class="action-card" style="--icon-bg: rgba(245,158,11,0.12); --card-color: #f59e0b;">
+      <div class="card-icon">📋</div>
+      <div class="card-name">Report Incident</div>
+      <div class="card-desc">Submit a detailed report of any safety-related incident.</div>
+      <span class="card-arr">↗</span>
+    </a>
+    <a href="/dashboard/" class="action-card" style="--icon-bg: rgba(34,197,94,0.12); --card-color: #22c55e;">
+      <div class="card-icon">📊</div>
+      <div class="card-name">Authority Dashboard</div>
+      <div class="card-desc">Monitor registrations, incidents, and SOS alerts.</div>
+      <span class="card-arr">↗</span>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+  <p class="section-label">Intelligence & Tracking</p>
+  <div class="grid grid-4">
+    <a href="/crime-map/" class="action-card" style="--icon-bg: rgba(6,182,212,0.12); --card-color: #06b6d4;">
+      <div class="card-icon">🗺️</div>
+      <div class="card-name">Crime Risk Map</div>
+      <div class="card-desc">Visualise crime hotspots and risk zones across regions.</div>
+      <span class="card-arr">↗</span>
+    </a>
+    <a href="/live-risk/" class="action-card" style="--icon-bg: rgba(249,115,22,0.12); --card-color: #f97316;">
+      <div class="card-icon">📍</div>
+      <div class="card-name">Check Location Risk</div>
+      <div class="card-desc">Get a real-time AI safety assessment for your current position.</div>
+      <span class="card-arr">↗</span>
+    </a>
+    <a href="/live-tracking/" class="action-card" style="--icon-bg: rgba(139,92,246,0.12); --card-color: #8b5cf6;">
+      <div class="card-icon">📡</div>
+      <div class="card-name">Live Tracking</div>
+      <div class="card-desc">Broadcast your live GPS position to safety authorities.</div>
+      <span class="card-arr">↗</span>
+    </a>
+    <a href="/sos-map/" class="action-card" style="--icon-bg: rgba(255,59,92,0.1); --card-color: #ff3b5c;">
+      <div class="card-icon">🚑</div>
+      <div class="card-name">SOS Live Map</div>
+      <div class="card-desc">Real-time map of all active emergency SOS alerts.</div>
+      <span class="card-arr">↗</span>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+  <p class="section-label">Emergency Resources</p>
+  <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+    <a href="/nearest-police/" class="action-card" style="--icon-bg: rgba(59,130,246,0.1); --card-color: #3b82f6;">
+      <div class="card-icon">🚔</div>
+      <div class="card-name">Nearest Police Station</div>
+      <div class="card-desc">Locate the closest police stations based on your GPS location.</div>
+      <span class="card-arr">↗</span>
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  <a href="/admin/" class="admin-link">⚙ Admin Panel</a>
+  <p style="margin-top: 1rem; font-size: 12px;">© 2025 Tourist Safety System · AI-Powered Monitoring</p>
+</footer>
+
+</body>
+</html>
