@@ -108,6 +108,7 @@ html, body {
     overflow-x: hidden;
     line-height: 1.6;
     transition: background-color 0.3s ease, color 0.3s ease;
+    touch-action: manipulation;
 }
 
 /* NAVBAR */
@@ -211,6 +212,7 @@ html, body {
     box-shadow: var(--shadow-glow-red);
     animation: pulseGlow 2s infinite;
     transition: transform 0.2s ease;
+    min-height: 44px;
 }
 
 .btn-sos-nav:hover {
@@ -223,11 +225,11 @@ html, body {
     background: transparent;
     border: 1px solid var(--border-light);
     color: var(--text-main);
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
 }
 
 /* LAYOUT & CARDS */
@@ -283,6 +285,7 @@ html, body {
     font-size: 0.95rem;
     outline: none;
     transition: all 0.25s ease;
+    min-height: 44px;
 }
 
 .form-control:focus {
@@ -305,6 +308,7 @@ html, body {
     text-decoration: none;
     border: none;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 44px;
 }
 
 .btn-primary {
@@ -339,6 +343,7 @@ html, body {
 .table-responsive {
     overflow-x: auto;
     border-radius: var(--radius-md);
+    -webkit-overflow-scrolling: touch;
 }
 
 .modern-table {
@@ -451,7 +456,10 @@ html, body {
 }
 
 @media (max-width: 768px) {
-    .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; gap: 1rem; }
+    
+    .nav-container { padding: 0.75rem 1rem; }
+
     .nav-links {
         display: none;
         position: absolute;
@@ -459,12 +467,37 @@ html, body {
         left: 0;
         right: 0;
         background: var(--bg-card);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         flex-direction: column;
-        padding: 1rem;
+        padding: 1.25rem 1rem;
         border-bottom: 1px solid var(--border-light);
+        gap: 6px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.5);
     }
     .nav-links.show { display: flex; }
+
+    .nav-link {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        width: 100%;
+        border-radius: var(--radius-md);
+    }
+
     .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+
+    /* Prevent iOS Safari 16px font zoom on focus */
+    select, input, textarea {
+        font-size: 16px !important;
+    }
+
+    .main-content {
+        padding: 1.25rem 1rem;
+    }
+
+    .glass-card {
+        padding: 1.25rem;
+    }
 }
 
 @keyframes pulseGlow {
