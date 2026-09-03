@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}{{ spot.name }} - Historic Heritage & Safety Guide{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto 3rem;">
+
+    <!-- Back Navigation Link -->
+    <a href="{% url 'tourist_spots' %}" class="btn btn-outline" style="margin-bottom: 1.5rem; display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem;">
+        <i class="fa-solid fa-arrow-left"></i> Back to All Destinations
+    </a>
+
+    <!-- Hero Image Banner & Header Card -->
+    <div class="glass-card" style="padding: 0; overflow: hidden; margin-bottom: 2rem; border-color: var(--border-glow);">
+        <div style="position: relative; height: 380px; width: 100%; overflow: hidden;">
+            <img src="{{ spot.image_url }}" alt="{{ spot.name }}" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.75);">
+            <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(9, 13, 22, 0.98) 0%, rgba(9, 13, 22, 0.4) 60%, transparent 100%);"></div>
+            
+            <div style="position: absolute; bottom: 2rem; left: 2rem; right: 2rem;">
+                <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+                    <span class="badge badge-info" style="font-size: 0.85rem; padding: 6px 14px;"><i class="fa-solid fa-map-pin"></i> {{ spot.state }}</span>
+                    <span class="badge badge-low" style="font-size: 0.85rem; padding: 6px 14px; background: rgba(245,158,11,0.2); color: var(--accent-amber); border-color: rgba(245,158,11,0.4);">
+                        {{ spot.category }}
+                    </span>
+                    <span class="badge badge-low" style="font-size: 0.85rem; padding: 6px 14px;">
+                        <i class="fa-solid fa-shield-check"></i> {{ spot.safety_rating }}
+                    </span>
+                </div>
+                <h1 style="font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; color: #ffffff; margin-bottom: 6px;">
+                    {{ spot.name }}
+                </h1>
+                <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 0;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--accent-red);"></i> {{ spot.city }}, {{ spot.state }}, India
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔊 MULTI-LANGUAGE AI AUDIO VOICE TOUR GUIDE PANEL -->
+    <div class="glass-card" style="padding: 1.5rem; margin-bottom: 2rem; border-left: 4px solid var(--accent-cyan); background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(15,23,42,0.85));">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--accent-cyan); letter-spacing: 0.1em; margin-bottom: 4px;">
+                    <i class="fa-solid fa-headphones"></i> Interactive Voice Guide
+                </div>
+                <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0;">
+                    AI Audio Tour Guide (Multi-Language Voice Narrator)
+                </h3>
+            </div>
+
+            <!-- Voice Controls & Language Accent Selector -->
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <select id="audioLangSelect" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.82rem; background: rgba(15, 23, 42, 0.9);">
+                    <option value="hi-IN">🇮🇳 Hindi Voice (हिंदी)</option>
+                    <option value="mr-IN">🇮🇳 Marathi Voice (मराठी)</option>
+                    <option value="en-IN" selected>🇬🇧 Indian English Voice</option>
+                    <option value="en-US">🇺🇸 US English Voice</option>
+                    <option value="es-ES">🇪🇸 Spanish Voice (Español)</option>
+                    <option value="fr-FR">🇫🇷 French Voice (Français)</option>
+                    <option value="de-DE">🇩🇪 German Voice (Deutsch)</option>
+                    <option value="ja-JP">🇯🇵 Japanese Voice (日本語)</option>
+                </select>
+
+                <button id="playAudioBtn" class="btn btn-primary" onclick="toggleAudioGuide()" style="padding: 0.6rem 1.4rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-play" id="audioIcon"></i> <span id="audioBtnText">Play AI Audio Guide</span>
+                </button>
+
+                <button class="btn btn-outline" onclick="stopAudioGuide()" style="padding: 0.6rem 1rem;">
+                    <i class="fa-solid fa-stop"></i> Stop
+                </button>
+            </div>
+        </div>
+
+        <!-- Hidden Narration Text Container -->
+        <div id="narrationText" style="display: none;">
+            Welcome to {{ spot.name }} in {{ spot.city }}, {{ spot.state }}. {{ spot.history }} {{ spot.detailed_history }} Visiting hours are {{ spot.best_time }}. Emergency helpline is {{ spot.helpline }}. Have a safe journey!
+        </div>
+    </div>
+
+    <!-- Content Grid: History & Safety Telematics -->
+    <div class="grid-2" style="grid-template-columns: 2fr 1fr; gap: 1.5rem; align-items: start;">
+
+        <!-- Left: Deep Cultural & Architectural History -->
+        <div class="glass-card" style="padding: 2rem;">
+            <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-landmark" style="color: var(--accent-amber);"></i> Cultural & Historical Background
+            </h3>
+            
+            <p style="font-size: 0.95rem; color: var(--text-main); line-height: 1.7; margin-bottom: 1.5rem; text-align: justify;">
+                {{ spot.detailed_history }}
+            </p>
+
+            <h4 style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 0.8rem;">
+                <i class="fa-solid fa-monument" style="color: var(--accent-blue);"></i> Architectural Significance
+            </h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 0;">
+                {{ spot.history }}
+            </p>
+        </div>
+
+        <!-- Right: Visiting Telematics & Emergency Command -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- Visiting Info Card -->
+            <div class="glass-card" style="padding: 1.5rem;">
+                <h4 style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-clock" style="color: var(--accent-blue);"></i> Visitor Guidelines
+                </h4>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.88rem;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;">
+                        <span style="color: var(--text-muted);">🕒 Visiting Hours</span>
+                        <strong style="color: #ffffff;">{{ spot.best_time }}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;">
+                        <span style="color: var(--text-muted);">🛡️ Safety Status</span>
+                        <strong style="color: var(--accent-emerald);">{{ spot.safety_rating }}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">📞 Emergency Line</span>
+                        <strong style="color: var(--accent-red);">{{ spot.helpline }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Police & Navigation Action Card -->
+            <div class="glass-card sos-card-accent" style="padding: 1.5rem;">
+                <h4 style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-building-shield" style="color: var(--accent-red);"></i> Emergency Protection
+                </h4>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+                    Instantly locate nearest police stations or get turn-by-turn navigation directions to {{ spot.name }}.
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="{% url 'nearest_police' %}?lat={{ spot.lat }}&lng={{ spot.lng }}" class="btn btn-primary" style="width: 100%; padding: 0.75rem; text-align: center;">
+                        <i class="fa-solid fa-shield-halved"></i> Locate Police Near {{ spot.name }}
+                    </a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination={{ spot.lat }},{{ spot.lng }}" target="_blank" class="btn btn-outline" style="width: 100%; padding: 0.75rem; text-align: center;">
+                        <i class="fa-solid fa-diamond-turn-right"></i> Open Directions in Google Maps
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Web Speech API AI Voice Narrator Engine
+    let synth = window.speechSynthesis;
+    let utterance = null;
+    let isPlaying = false;
+
+    function toggleAudioGuide() {
+        if (!synth) {
+            alert("Audio Speech Narrator is not supported by your browser.");
+            return;
+        }
+
+        if (isPlaying) {
+            if (synth.paused) {
+                synth.resume();
+                updateAudioUI(true);
+            } else {
+                synth.pause();
+                updateAudioUI(false, "Paused");
+            }
+        } else {
+            startAudioNarration();
+        }
+    }
+
+    function startAudioNarration() {
+        synth.cancel(); // Stop any ongoing speech
+
+        // Dynamically capture translated heading and history text on page
+        const titleText = document.querySelector('h1')?.innerText || '';
+        const mainHistory = document.querySelectorAll('.glass-card p')[0]?.innerText || '';
+        const archHistory = document.querySelectorAll('.glass-card p')[1]?.innerText || '';
+        const fullTextToRead = titleText + ". " + mainHistory + " " + archHistory;
+
+        const selectedLang = window.currentSelectedLangCode || document.getElementById('audioLangSelect').value || 'en-IN';
+        document.getElementById('audioLangSelect').value = selectedLang;
+
+        utterance = new SpeechSynthesisUtterance(fullTextToRead);
+        utterance.lang = selectedLang;
+        utterance.rate = 0.95; // Natural speaking pace
+        utterance.pitch = 1.0;
+
+        // Match system voice in target language (e.g. Hindi hi-IN, Marathi mr-IN, English en-IN, etc.)
+        const voices = synth.getVoices();
+        const baseLang = selectedLang.split('-')[0];
+        const matchedVoice = voices.find(v => v.lang === selectedLang) || 
+                             voices.find(v => v.lang.startsWith(baseLang));
+
+        if (matchedVoice) {
+            utterance.voice = matchedVoice;
+        }
+
+        utterance.onend = function() {
+            isPlaying = false;
+            updateAudioUI(false);
+        };
+
+        utterance.onerror = function() {
+            isPlaying = false;
+            updateAudioUI(false);
+        };
+
+        synth.speak(utterance);
+        isPlaying = true;
+        updateAudioUI(true);
+    }
+
+
+    function stopAudioGuide() {
+        if (synth) {
+            synth.cancel();
+            isPlaying = false;
+            updateAudioUI(false);
+        }
+    }
+
+    function updateAudioUI(playing, label) {
+        const btnText = document.getElementById('audioBtnText');
+        const icon = document.getElementById('audioIcon');
+
+        if (playing) {
+            btnText.textContent = "Pause Audio Guide";
+            icon.className = "fa-solid fa-pause";
+        } else {
+            btnText.textContent = label ? label : "Play AI Audio Guide";
+            icon.className = "fa-solid fa-play";
+        }
+    }
+
+    // Populate voices when available
+    if (synth && synth.onvoiceschanged !== undefined) {
+        synth.onvoiceschanged = () => synth.getVoices();
+    }
+</script>
+{% endblock %}
+

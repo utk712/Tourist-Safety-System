@@ -3,5 +3,5 @@ from .views import home, register_tourist
 
 urlpatterns = [
     path("", home, name="home"),
-    path("register/", register_tourist, name="register"),
+    path("register/", register_tourist, name="register_tourist"),
 ]

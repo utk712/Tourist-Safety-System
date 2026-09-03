@@ -1,82 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Live Location Tracking</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #0a0f1e; --surface: #111827; --surface2: #1a2235;
-  --border: rgba(255,255,255,0.07); --border-md: rgba(255,255,255,0.13);
-  --text: #f0f4ff; --muted: #7a8aaa;
-  --accent-b: #3b82f6; --accent-g: #22c55e;
-  --radius: 12px; --radius-lg: 18px;
-  --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
-}
-html, body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; margin: 0; }
-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 2rem; border-bottom: 1px solid var(--border);
-  background: rgba(10,15,30,0.95); backdrop-filter: blur(12px);
-  position: sticky; top: 0; z-index: 1000;
-}
-.brand { font-family: var(--font-head); font-weight: 800; font-size: 1.05rem; }
-.brand span { color: var(--accent-b); }
-.back-link { font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
-.back-link:hover { color: var(--text); }
+{% extends "base.html" %}
 
-.page { padding: 2rem; max-width: 1100px; margin: 0 auto; }
-.page-header { margin-bottom: 1.25rem; }
-h1 { font-family: var(--font-head); font-size: 1.6rem; font-weight: 800; }
+{% block title %}Live GPS Location & Geofence Tracker - SafeGuard AI{% endblock %}
 
-.status-bar {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 12px 16px;
-  font-size: 13px; color: var(--muted);
-  margin-bottom: 1rem;
-  display: flex; align-items: center; gap: 8px;
-}
-.status-bar.active { color: #4ade80; border-color: rgba(34,197,94,0.2); background: rgba(34,197,94,0.05); }
-.pulse { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: blink 1.5s ease-in-out infinite; flex-shrink: 0; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
-
-#map {
-  height: 600px; width: 100%;
-  border-radius: var(--radius-lg); overflow: hidden;
-  border: 1px solid var(--border);
-}
-</style>
-</head>
-<body>
-
-<nav>
-  <div class="brand">🌍 Tourist<span>Safe</span></div>
-  <a href="/" class="back-link">← Home</a>
-</nav>
-
-<div class="page">
-  <div class="page-header">
-    <h1>📡 Live Location Tracking</h1>
-  </div>
-
-  <div class="status-bar" id="status">
-    <span class="pulse"></span>
-    Waiting for location...
-  </div>
-
-  <div id="map"></div>
+{% block content %}
+<div style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-tower-broadcast" style="color: #a78bfa;"></i> Live GPS Geofence Tracker</h1>
+        <p class="page-subtitle" style="margin-bottom: 0;">Broadcast real-time movement and receive instant danger zone geofence warnings.</p>
+    </div>
+    <div class="badge badge-low" id="status" style="font-size: 0.85rem; padding: 8px 16px;">
+        <i class="fa-solid fa-satellite fa-spin"></i> Initializing GPS connection…
+    </div>
 </div>
 
-<script>
-var map = L.map('map').setView([22.9734,78.6569],5);
+<!-- Geofence Safety Banner Alert -->
+<div id="geofenceBanner" class="badge badge-high" style="display: none; width: 100%; font-size: 0.95rem; padding: 14px 20px; margin-bottom: 1.5rem; justify-content: flex-start; border-radius: var(--radius-md); box-shadow: var(--shadow-glow-red);">
+    <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.3rem;"></i>
+    <div>
+        <strong>GEOFENCE SAFETY WARNING:</strong> High-risk area detected near your GPS location. Keep your phone accessible and stay in well-lit areas!
+    </div>
+</div>
 
-L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',{
-  maxZoom:19,
-  attribution:'© OpenStreetMap contributors'
+<div class="glass-card" style="padding: 1rem; margin-bottom: 2rem;">
+    <div id="map" class="map-container" style="height: 600px;"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var map = L.map('map').setView([22.9734, 78.6569], 5);
+
+L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '© OpenStreetMap'
 }).addTo(map);
 
 var marker;
@@ -88,8 +44,8 @@ function updateLocation(position){
   var accuracy = position.coords.accuracy;
 
   var statusEl = document.getElementById("status");
-  statusEl.className = 'status-bar active';
-  statusEl.innerHTML = '<span class="pulse"></span>Latitude: ' + lat.toFixed(6) + ' &nbsp;|&nbsp; Longitude: ' + lng.toFixed(6) + ' &nbsp;|&nbsp; Accuracy: ' + Math.round(accuracy) + 'm';
+  statusEl.className = 'badge badge-low';
+  statusEl.innerHTML = '<i class="fa-solid fa-signal"></i> GPS Live: ' + lat.toFixed(5) + ', ' + lng.toFixed(5) + ' (Accuracy: ±' + Math.round(accuracy) + 'm)';
 
   if(marker){
     marker.setLatLng([lat,lng]);
@@ -97,40 +53,52 @@ function updateLocation(position){
     accuracyCircle.setRadius(accuracy);
   } else {
     marker = L.marker([lat,lng]).addTo(map)
-      .bindPopup("📍 Your Current Location")
+      .bindPopup("📍 <b>Broadcast Live Location</b>")
       .openPopup();
 
-    accuracyCircle = L.circle([lat,lng],{
+    accuracyCircle = L.circle([lat,lng], {
       radius: accuracy,
-      color:'#3b82f6',
-      fillOpacity:0.15,
-      weight:1
+      color: '#3b82f6',
+      fillOpacity: 0.15,
+      weight: 1
     }).addTo(map);
   }
 
-  map.setView([lat,lng],16);
+  map.setView([lat,lng], 16);
 
-  fetch("/update-location/",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({lat:lat,lng:lng})
+  // Evaluate risk level for coordinates
+  fetch(`/risk-check/?lat=${lat}&lng=${lng}`)
+    .then(res => res.json())
+    .then(data => {
+      const banner = document.getElementById('geofenceBanner');
+      if (data.risk_level === 'High') {
+        banner.style.display = 'flex';
+      } else {
+        banner.style.display = 'none';
+      }
+    }).catch(() => {});
+
+  fetch("/update-location/", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({lat: lat, lng: lng})
   });
 }
 
 function locationError(){
-  document.getElementById("status").innerHTML =
-    '<span class="pulse"></span>⚠ Location access denied or unavailable.';
+  var statusEl = document.getElementById("status");
+  statusEl.className = 'badge badge-high';
+  statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Location access denied or unavailable.';
 }
 
 if(navigator.geolocation){
   navigator.geolocation.watchPosition(
     updateLocation,
     locationError,
-    {enableHighAccuracy:true,timeout:10000,maximumAge:0}
+    {enableHighAccuracy: true, timeout: 10000, maximumAge: 0}
   );
 } else {
-  alert("Geolocation not supported");
+  alert("Geolocation is not supported by your browser");
 }
 </script>
-</body>
-</html>
+{% endblock %}

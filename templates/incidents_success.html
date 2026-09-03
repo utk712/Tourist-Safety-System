@@ -1,58 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Incident Reported</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #0a0f1e; --surface: #111827; --surface2: #1a2235;
-  --border: rgba(255,255,255,0.07); --text: #f0f4ff; --muted: #7a8aaa;
-  --accent-b: #3b82f6; --accent-g: #22c55e;
-  --radius: 12px; --radius-lg: 18px;
-  --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
-}
-html, body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; display: flex; flex-direction: column; }
-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 2rem; border-bottom: 1px solid var(--border);
-  background: rgba(10,15,30,0.9);
-}
-.brand { font-family: var(--font-head); font-weight: 800; font-size: 1.05rem; }
-.brand span { color: var(--accent-b); }
-.center { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem; }
-.box { text-align: center; max-width: 440px; }
-.check {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: rgba(34,197,94,0.12); border: 2px solid rgba(34,197,94,0.3);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 30px; margin: 0 auto 1.5rem;
-}
-h1 { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; margin-bottom: 0.75rem; }
-p { color: var(--muted); font-size: 14px; line-height: 1.65; margin-bottom: 2rem; }
-.btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 11px 22px; border-radius: var(--radius);
-  background: var(--surface2); color: var(--text);
-  border: 1px solid rgba(255,255,255,0.13); font-family: var(--font-body);
-  font-size: 14px; text-decoration: none; transition: background 0.2s;
-}
-.btn:hover { background: #222e45; }
-</style>
-</head>
-<body>
-<nav>
-  <div class="brand">🌍 Tourist<span>Safe</span></div>
-</nav>
-<div class="center">
-  <div class="box">
-    <div class="check">✓</div>
-    <h1>Incident Reported</h1>
-    <p>Your report has been received and forwarded to local authorities. They will review it promptly and take appropriate action.</p>
-    <a href="/" class="btn">← Back to Home</a>
-  </div>
+{% extends "base.html" %}
+
+{% block title %}Incident Report Submitted - SafeGuard AI{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 3rem auto; text-align: center;">
+    <div class="glass-card" style="padding: 2.5rem;">
+        <div style="width: 80px; height: 80px; background: rgba(16,185,129,0.15); border: 2px solid rgba(16,185,129,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: var(--accent-emerald); margin: 0 auto 1.5rem;">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h1 class="page-title" style="font-size: 2rem;">Incident Report Submitted</h1>
+        <div class="badge badge-low" style="font-size: 0.9rem; padding: 10px 20px; margin: 1rem 0 1.5rem;">
+            <i class="fa-solid fa-shield"></i> Logged into Authority Command Portal
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 2rem;">
+            Your report has been logged and forwarded to monitoring authorities. Thank you for helping keep tourist areas safe.
+        </p>
+        <a href="{% url 'home' %}" class="btn btn-outline">
+            <i class="fa-solid fa-house"></i> Return to Safety Home
+        </a>
+    </div>
 </div>
-</body>
-</html>
+{% endblock %}

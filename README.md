@@ -1,198 +1,144 @@
-# Smart Tourist Safety Monitoring System
+# 🛡️ SafeGuard AI - Smart Tourist Safety Monitoring & Crime Risk Prediction System
 
-A Django-based web platform that helps monitor tourist safety, raise SOS alerts, report incidents, and predict crime risk using a trained ML model.
-
----
-
-## Features
-
-- **Tourist registration**
-- **SOS emergency alerts** (stores user + GPS coordinates)
-- **Incident reporting**
-- **Authority dashboard** (lists tourists, incidents, SOS alerts)
-- **Crime risk prediction** (AI model)
-- **Crime heatmap & map view** (Leaflet + server-provided predicted points)
-- **Nearest police lookup** (Geoapify places API)
-- **Live tracking UI** (page + endpoint scaffolding)
+**SafeGuard AI** is an advanced, AI-powered web platform built to protect tourists, predict regional crime risks, provide 1-click emergency SOS alerts, locate nearby police stations, and offer an interactive All-India Monuments Heritage Portal with AI Audio Voice Guides.
 
 ---
 
-## Tech Stack
+## 🌟 Key Features & Capabilities
 
-- **Backend:** Django (Python)
-- **Database:** Microsoft SQL Server (via `mssql-django` + `pyodbc`)
-- **ML:** scikit-learn (`RandomForestClassifier`)
-- **Frontend:** Bootstrap 5
-- **Maps:** Leaflet + Leaflet.heat
+### 🚨 1. Emergency SOS & Rapid Telematics (`/sos/`)
+- **1-Click Mobile Speed-Dial Helplines**: Instant one-tap calling for `112` (National Emergency), `100` (Police Control), `108` (Ambulance), and `1091` (Women Safety).
+- **GPS SOS Broadcast**: Transmits live latitude and longitude coordinates directly to authority dispatchers.
+
+### 🏛️ 2. All-India Monuments & Heritage Portal (`/tourist-spots/`)
+- **Comprehensive Monument Database**: Detailed records for historical heritage sites across Indian states (*Sanchi Stupa, Bhimbetka Rock Shelters, Khajuraho Temples, Gwalior Fort, Orchha Fort, Sawalmendha Satpura Reserve, Ajanta Caves, Ellora Kailash Temple, Gateway of India, Raigad Fort, Amer Fort, Taj Mahal, Qutub Minar, Rani ki Vav*).
+- **Authentic Monument Photography**: High-definition verified Wikipedia & Wikimedia Commons photography matching each exact monument.
+- **Search & Filtering**: Search box, state dropdown filter, and category quick-filter chips (*UNESCO Heritage, Ancient Caves, Forts & Castles, Palaces, Nature Reserves*).
+
+### 🔊 3. Dedicated Monument Showcase & AI Audio Tour Guide (`/tourist-spot/<spot_id>/`)
+- **Hero Image & Deep History**: Full-page showcase with extensive historical chronicles, founding emperors/dynasties, architectural techniques, visitor guidelines, and emergency police response bar.
+- **AI Audio Voice Tour Guide**: Powered by Web Speech Synthesis (`window.speechSynthesis`) with **Play**, **Pause**, and **Stop** narration controls.
+
+### 🤖 4. Floating AI Tourist Safety Assistant (`/ai-chat/`)
+- Glassmorphic floating AI chatbot widget accessible on all pages.
+- Provides real-time advice on police lookups, emergency SOS guidance, medical assistance, late-night travel safety, and women safety helplines.
+
+### 🚔 5. Nearest Police Station Lookup (`/nearest-police/`)
+- **Proximity Bias Engine**: Uses Geoapify Places API v2 + OpenStreetMap Nominatim geocoding proxy to find nearest police stations within 50km.
+- **Interactive Map**: Live GPS detection, search box fallback, draggable pin, real-time distance calculation badges, and 1-click Google Maps directions.
+
+### 📊 6. Authority Command Center Dashboard (`/dashboard/`)
+- **Web Audio API Siren Alert**: Automatic audio siren synthesizer alerts dispatchers whenever an active SOS emergency ping is received.
+- **10-Second Telemetry Refresh**: Continuous background data polling.
+
+### 🎨 7. Modern Glassmorphic Design System & Dynamic Theme Switcher
+- Styled in dark glassmorphism (`#090d16` background with frosted glass cards).
+- **5 Real-Time UI Themes** with automatic `localStorage` persistence:
+  1. 🌌 **Midnight Cyber (Default)**
+  2. 🟧 **Neon Orange**
+  3. 💎 **Sapphire Ocean**
+  4. 🌿 **Emerald Forest**
+  5. ☀️ **Clean Light**
 
 ---
 
-## Project Structure
+## 🛠️ Technology Stack
 
-```
+- **Backend Framework:** Django (Python 3.14)
+- **Machine Learning:** `scikit-learn` (`RandomForestClassifier` trained on Indian crime dataset)
+- **Database:** Microsoft SQL Server (`mssql-django` + `pyodbc`) / SQLite fallback
+- **Geospatial APIs:** Geoapify Places API v2, Nominatim OpenStreetMap API
+- **Frontend Design:** HTML5, CSS3 Glassmorphism, JavaScript ES6+, FontAwesome 6, Leaflet.js
+- **Speech Engine:** Web Speech Synthesis API (`SpeechSynthesisUtterance`)
+- **Audio Synthesizer:** Web Audio API (`AudioContext` Siren Oscillator)
+
+---
+
+## 📁 Project Architecture
+
+```text
 Tourist_safety_system/
-├─ manage.py
-├─ config/
-│  ├─ settings.py
-│  ├─ urls.py
-├─ apps/
-│  ├─ users/
-│  │  ├─ models.py
-│  │  ├─ views.py
-│  │  └─ urls.py
-│  ├─ incidents/
-│  │  ├─ models.py
-│  │  ├─ views.py
-│  │  └─ urls.py
-│  └─ monitoring/
-│     ├─ models.py
-│     ├─ views.py
-│     └─ urls.py
-├─ ai_module/
-│  ├─ train_model.py
-│  ├─ risk_prediction.py
-│  ├─ city_coordinates.py
-│  ├─ encoders/*.pkl
-│  ├─ risk_model.pkl
-│  └─ dataset/crime_dataset_india.csv
-├─ templates/
-│  └─ *.html
-├─ static/
-│  └─ *.css, *.js
-└─ requirements.txt
+├── manage.py
+├── config/
+│   ├── settings.py
+│   └── urls.py
+├── apps/
+│   ├── users/            # Tourist registration & home landing
+│   ├── incidents/        # Incident reporting system
+│   └── monitoring/       # SOS, Dashboard, Police Lookup, AI Chat & Tourist Spots
+├── ai_module/
+│   ├── train_model.py    # scikit-learn model trainer
+│   ├── risk_prediction.py# Inference engine
+│   └── encoders/*.pkl    # Label Encoders & RandomForest pickle
+├── templates/            # Glassmorphic HTML5 templates
+├── static/
+│   ├── style.css         # Dynamic CSS theme design system
+│   └── scripts.js        # Theme switcher & location scripts
+└── .env                  # Environment variables (Geoapify API Key, Secret Key)
 ```
 
 ---
 
-## AI / ML Model
+## 🚀 Setup & Installation Guide
 
-- **Dataset:** `ai_module/dataset/crime_dataset_india.csv`
-- **Training:** `ai_module/train_model.py`
-- **Inference helper:** `ai_module/risk_prediction.py`
-  - Loads:
-    - `ai_module/risk_model.pkl`
-    - encoders: `encoder_city.pkl`, `encoder_crime.pkl`, `encoder_gender.pkl`, `encoder_weapon.pkl`, `encoder_domain.pkl`, `encoder_risk.pkl`
-  - Main function:
-    - `predict_risk(city, hour, crime_description, victim_age, victim_gender, weapon_used, crime_domain, crime_count)`
-
-> Note: `predict_risk` uses a safe transform for unknown categorical values.
-
----
-
-## Routes / URLs
-
-### App routes
-
-From `apps/users/urls.py`:
-- `GET /` → `apps.users.views.home` → `templates/home.html`
-- `POST /register/` → `apps.users.views.register_tourist` → redirects to `/`
-
-From `apps/incidents/urls.py`:
-- `POST /incidents/` → `apps.incidents.views.report_incident` → `templates/incidents_success.html`
-
-From `apps/monitoring/urls.py`:
-- `POST /sos/` → `sos_alert` → `templates/sos_success.html`
-- `GET /dashboard/` → `dashboard` → `templates/dashboard.html`
-- `GET /risk-check/` → `check_location_risk` → returns JSON
-- `GET /crime-heatmap/` → `crime_heatmap_data` → returns JSON array
-- `GET /crime-map/` → `crime_map` → `templates/map_dashboard.html`
-
-Pages:
-- `GET /live-risk/` → `templates/live_risk.html`
-- `GET /live-tracking/` → `templates/live_tracking.html`
-- `GET /sos-map/` → `templates/sos_dashboard.html`
-- `GET /nearest-police/` → `templates/nearest_police.html`
-
-APIs:
-- `GET /sos-data/` → SOS coordinates list (JSON)
-- `POST /update-location/` → location received response
-- `GET /nearest-police-data/` → nearest police stations via Geoapify
-
----
-
-## Setup & Run
-
-### 1) Install dependencies
-
+### 1) Clone Repository & Install Dependencies
 ```bash
-pip install -r reqirements.txt
+git clone https://github.com/utk712/Tourist-Safety-System.git
+cd Tourist-Safety-System
+pip install -r requirements.txt
 ```
 
-### 2) Configure SQL Server
+### 2) Environment Configuration (`.env`)
+Create a `.env` file in the project root:
+```env
+GEOAPIFY_API_KEY=your_geoapify_api_key_here
+SECRET_KEY=your_django_secret_key
+DEBUG=True
+```
 
-Edit `config/settings.py`:
-- `DATABASES['default']` must match your SQL Server instance.
-- Current configuration uses:
-  - `driver`: `ODBC Driver 17 for SQL Server`
-  - `trusted_connection`: `yes`
+### 3) Train AI Model (Optional)
+```bash
+python ai_module/train_model.py
+```
 
-### 3) Migrate database
-
+### 4) Database Migration
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 4) (Optional) Train the ML model
-
-If you need to retrain:
-
-```bash
-python ai_module/train_model.py
-```
-
-Ensure `ai_module/risk_model.pkl` and encoder `.pkl` files exist after training.
-
-### 5) Run the server
-
+### 5) Launch Server
 ```bash
 python manage.py runserver
 ```
 
-Open:
-- `http://127.0.0.1:8000/`
+Open your browser at **`http://127.0.0.1:8000/`**.
 
 ---
 
-## Example API Usage
+## 📜 Key URL Routes
 
-### Risk check
-
-```text
-GET /risk-check/?city=Mumbai&hour=22
-```
-
-Response:
-```json
-{
-  "city": "Mumbai",
-  "risk_level": "High"
-}
-```
-
-### Crime heatmap data
-
-```text
-GET /crime-heatmap/
-```
-
-Response (example):
-```json
-[
-  {"lat": 19.076, "lng": 72.8777, "risk": "High"}
-]
-```
+| Feature | URL Path | Function |
+| :--- | :--- | :--- |
+| **Home Landing Page** | `/` | User onboarding & feature overview |
+| **Tourist Spots Catalog** | `/tourist-spots/` | All-India monuments portal |
+| **Monument Detail Page** | `/tourist-spot/<spot_id>/` | Deep history & AI audio tour guide |
+| **Police Station Lookup** | `/nearest-police/` | Live GPS police finder & directions |
+| **Authority Dashboard** | `/dashboard/` | Command center & Web Audio siren alert |
+| **Emergency SOS Alert** | `/sos/` | 1-touch helplines & GPS broadcast |
+| **AI Location Risk Check** | `/live-risk/` | ML risk evaluation |
+| **Crime Density Heatmap** | `/crime-map/` | Leaflet.heat risk density map |
+| **AI Assistant Chatbot** | `/ai-chat/` | Floating safety assistant endpoint |
 
 ---
 
-## Security / Notes
+## 🔒 Security & Privacy
 
-- `config/settings.py` currently has `DEBUG = True` and `ALLOWED_HOSTS = ["*"]`.
-- `apps/monitoring/views.py` includes a **Geoapify API key** in `get_nearest_police`. For production, move it to environment variables (e.g., `.env`) and do not commit it.
+- Sensitive API keys (`GEOAPIFY_API_KEY`, `SECRET_KEY`) are protected inside `.env` and listed in `.gitignore`.
+- Live location tracking uses client-permissioned HTML5 Geolocation API.
 
 ---
 
-## License
+## 📄 License
 
-Add your license information here (or remove this section). 
-
+Developed for Smart Tourist Safety & Protection Systems. Licensed under MIT.

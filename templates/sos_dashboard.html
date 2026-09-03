@@ -1,77 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS Live Map</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #0a0f1e; --surface: #111827; --surface2: #1a2235;
-  --border: rgba(255,255,255,0.07); --text: #f0f4ff; --muted: #7a8aaa;
-  --accent-b: #3b82f6; --accent-r: #ff3b5c;
-  --radius: 12px; --radius-lg: 18px;
-  --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
-}
-html, body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; margin: 0; }
-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 2rem; border-bottom: 1px solid var(--border);
-  background: rgba(10,15,30,0.95); backdrop-filter: blur(12px);
-  position: sticky; top: 0; z-index: 1000;
-}
-.brand { font-family: var(--font-head); font-weight: 800; font-size: 1.05rem; }
-.brand span { color: var(--accent-b); }
-.nav-right { display: flex; align-items: center; gap: 14px; }
-.back-link { font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
-.back-link:hover { color: var(--text); }
-.alert-badge {
-  font-size: 11px; background: rgba(255,59,92,0.1); color: #f87171;
-  border: 1px solid rgba(255,59,92,0.2); padding: 3px 11px; border-radius: 100px;
-  display: flex; align-items: center; gap: 5px;
-}
-.alert-badge::before { content: ''; width: 6px; height: 6px; background: var(--accent-r); border-radius: 50%; animation: blink 1.5s ease-in-out infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+{% extends "base.html" %}
 
-.page { padding: 1.5rem 2rem 2rem; max-width: 1200px; margin: 0 auto; }
-.page-header { margin-bottom: 1rem; }
-h1 { font-family: var(--font-head); font-size: 1.5rem; font-weight: 800; margin-bottom: 3px; }
-.sub { color: var(--muted); font-size: 13px; }
+{% block title %}SOS Emergency Live Pins Map - SafeGuard AI{% endblock %}
 
-#map {
-  height: 620px; width: 100%;
-  border-radius: var(--radius-lg); overflow: hidden;
-  border: 1px solid rgba(255,59,92,0.15);
-}
-</style>
-</head>
-<body>
-
-<nav>
-  <div class="brand">🌍 Tourist<span>Safe</span></div>
-  <div class="nav-right">
-    <div class="alert-badge">SOS Active</div>
-    <a href="/" class="back-link">← Home</a>
-  </div>
-</nav>
-
-<div class="page">
-  <div class="page-header">
-    <h1>🚨 Live SOS Alerts</h1>
-    <p class="sub">Real-time map of all active emergency SOS alerts.</p>
-  </div>
-
-  <div id="map"></div>
+{% block content %}
+<div style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-map-pin" style="color: var(--accent-red);"></i> SOS Live Emergency Pins</h1>
+        <p class="page-subtitle" style="margin-bottom: 0;">Real-time geographical map plotting all active emergency broadcasts.</p>
+    </div>
+    <div class="badge badge-high" style="font-size: 0.85rem; padding: 8px 16px;">
+        <i class="fa-solid fa-bell" style="animation: pulseGlow 1.5s infinite;"></i> SOS Live Monitoring Feed Active
+    </div>
 </div>
 
-<script>
-var map = L.map('map').setView([22.9734,78.6569],5);
+<div class="glass-card sos-card-accent" style="padding: 1rem; margin-bottom: 2rem;">
+    <div id="map" class="map-container" style="height: 620px;"></div>
+</div>
+{% endblock %}
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  maxZoom:19
+{% block extra_js %}
+<script>
+var map = L.map('map').setView([22.9734, 78.6569], 5);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19
 }).addTo(map);
 
 function loadSOS(){
@@ -81,9 +33,10 @@ function loadSOS(){
       data.forEach(function(alert){
         var marker = L.marker([alert.lat, alert.lng]).addTo(map);
         marker.bindPopup(
-          "<strong>Tourist:</strong> " + alert.user + "<br>" +
-          "<strong>Lat:</strong> " + alert.lat + "<br>" +
-          "<strong>Lng:</strong> " + alert.lng
+          "<div style='color:#0f172a;'><strong><i class='fa-solid fa-bell' style='color:#ef4444;'></i> Tourist:</strong> " + alert.user + "<br>" +
+          "<strong>Latitude:</strong> " + alert.lat + "<br>" +
+          "<strong>Longitude:</strong> " + alert.lng + "<br><br>" +
+          "<a href='https://www.google.com/maps?q=" + alert.lat + "," + alert.lng + "' target='_blank' style='color:#3b82f6; font-weight:bold;'>Open Directions</a></div>"
         );
       });
     });
@@ -91,5 +44,4 @@ function loadSOS(){
 
 loadSOS();
 </script>
-</body>
-</html>
+{% endblock %}

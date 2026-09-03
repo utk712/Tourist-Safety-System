@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}All Monuments & Tourist Spots of India - SafeGuard AI{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-gopuram" style="color: var(--accent-amber);"></i> All Monuments & Tourist Spots of India</h1>
+        <p class="page-subtitle" style="margin-bottom: 0;">Explore historical heritage, AI audio voice guides, visiting timings, and emergency helplines.</p>
+    </div>
+    <div class="badge badge-info" style="font-size: 0.85rem; padding: 8px 16px;">
+        <i class="fa-solid fa-landmark-flag"></i> Showing {{ spots|length }} Destinations
+    </div>
+</div>
+
+<!-- Search & Filter Controls -->
+<div class="glass-card" style="padding: 1.5rem; margin-bottom: 2rem;">
+    <form method="GET" action="{% url 'tourist_spots' %}" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px; align-items: center;">
+        
+        <!-- Search Keyword -->
+        <div>
+            <label class="form-label" style="font-size: 0.75rem; margin-bottom: 4px;">Search Monument or City</label>
+            <div style="position: relative;">
+                <input type="text" name="q" class="form-control" placeholder="Search Sawalmendha, Taj Mahal, Sanchi, Forts..." value="{{ search_query }}" style="padding-left: 2.2rem;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem;"></i>
+            </div>
+        </div>
+
+        <!-- Filter by State -->
+        <div>
+            <label class="form-label" style="font-size: 0.75rem; margin-bottom: 4px;">Filter by State</label>
+            <select name="state" class="form-control" onchange="this.form.submit()">
+                <option value="">All States / UTs</option>
+                {% for st in states %}
+                <option value="{{ st }}" {% if selected_state == st %}selected{% endif %}>{{ st }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Filter by Category -->
+        <div>
+            <label class="form-label" style="font-size: 0.75rem; margin-bottom: 4px;">Category</label>
+            <select name="category" class="form-control" onchange="this.form.submit()">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Filter Action Buttons -->
+        <div style="display: flex; gap: 6px; margin-top: 1rem;">
+            <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.2rem;">
+                Filter
+            </button>
+            <a href="{% url 'tourist_spots' %}" class="btn btn-outline" style="padding: 0.6rem 1rem;">
+                Reset
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Category Chips Quick Bar -->
+<div style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 2rem; padding-bottom: 6px;">
+    <a href="{% url 'tourist_spots' %}" class="btn {% if not selected_category %}btn-primary{% else %}btn-outline{% endif %}" style="padding: 6px 16px; font-size: 0.8rem; border-radius: 50px; white-space: nowrap;">
+        All Monuments
+    </a>
+    {% for cat in categories %}
+    <a href="{% url 'tourist_spots' %}?category={{ cat|urlencode }}" class="btn {% if selected_category == cat %}btn-primary{% else %}btn-outline{% endif %}" style="padding: 6px 16px; font-size: 0.8rem; border-radius: 50px; white-space: nowrap;">
+        {{ cat }}
+    </a>
+    {% endfor %}
+</div>
+
+<!-- Monument Cards Grid -->
+<div class="grid-3" style="gap: 1.5rem; margin-bottom: 3rem;">
+    {% for spot in spots %}
+    <div class="glass-card glass-card-hover" style="display: flex; flex-direction: column; justify-content: space-between; border-left: 4px solid var(--accent-blue); padding: 0; overflow: hidden;">
+        
+        <!-- Image Header Thumbnail -->
+        <a href="{% url 'tourist_spot_detail' spot.id %}" style="display: block; position: relative; height: 180px; overflow: hidden; text-decoration: none;">
+            <img src="{{ spot.image_url }}" alt="{{ spot.name }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;">
+            <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(9, 13, 22, 0.9), transparent 60%);"></div>
+            
+            <div style="position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between;">
+                <span class="badge badge-info" style="font-size: 0.75rem;"><i class="fa-solid fa-map-pin"></i> {{ spot.state }}</span>
+                <span class="badge badge-low" style="font-size: 0.75rem; background: rgba(245,158,11,0.2); color: var(--accent-amber); border-color: rgba(245,158,11,0.4);">
+                    {{ spot.category }}
+                </span>
+            </div>
+
+            <div style="position: absolute; bottom: 10px; left: 12px; right: 12px;">
+                <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: #ffffff; margin: 0;">
+                    <i class="fa-solid {{ spot.image_icon }}" style="color: var(--accent-amber); margin-right: 6px;"></i> {{ spot.name }}
+                </h3>
+            </div>
+        </a>
+
+        <!-- Card Body -->
+        <div style="padding: 1.25rem; display: flex; flex-direction: column; flex: 1;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+                <i class="fa-solid fa-location-dot" style="color: var(--accent-red);"></i> {{ spot.city }}, {{ spot.state }}
+            </div>
+
+            <!-- Short History Description -->
+            <p style="font-size: 0.85rem; color: var(--text-main); line-height: 1.5; margin-bottom: 1rem; flex: 1;">
+                {{ spot.history|truncatewords:24 }}
+            </p>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: auto;">
+                <a href="{% url 'tourist_spot_detail' spot.id %}" class="btn btn-primary" style="width: 100%; padding: 0.5rem; text-align: center; font-size: 0.85rem;">
+                    <i class="fa-solid fa-headphones"></i> Explore History & Audio Guide
+                </a>
+
+                <div style="display: flex; gap: 8px;">
+                    <a href="https://www.google.com/maps/dir/?api=1&destination={{ spot.lat }},{{ spot.lng }}" target="_blank" class="btn btn-outline" style="flex: 1; padding: 0.4rem; font-size: 0.8rem; text-align: center;">
+                        <i class="fa-solid fa-diamond-turn-right"></i> Maps
+                    </a>
+                    <a href="{% url 'nearest_police' %}?lat={{ spot.lat }}&lng={{ spot.lng }}" class="btn btn-outline" style="flex: 1; padding: 0.4rem; font-size: 0.8rem; text-align: center;">
+                        <i class="fa-solid fa-building-shield"></i> Police
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% empty %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem;" class="glass-card">
+        <i class="fa-solid fa-landmark-flag" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+        <h3 style="color: #ffffff;">No Monuments Found</h3>
+        <p style="color: var(--text-muted);">No destinations matched your query "{{ search_query }}". Try resetting your filter.</p>
+        <a href="{% url 'tourist_spots' %}" class="btn btn-primary" style="margin-top: 1rem;">View All Destinations</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

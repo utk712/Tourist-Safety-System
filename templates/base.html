@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tourist Safety System{% endblock %}</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Custom CSS with Cache-Busting -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}?v=4.0">
+
+    {% block extra_css %}{% endblock %}
+    
+    <script>
+        (function() {
+            var theme = localStorage.getItem('userTheme') || 'cyber';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
+    <style>
+        /* Hide Google Translate attribution top bar & popups completely */
+        .goog-te-banner-frame,
+        .goog-te-banner,
+        .goog-te-balloon-frame,
+        #goog-gt-tt,
+        .goog-te-spinner-pos,
+        iframe.skiptranslate {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            height: 0 !important;
+            width: 0 !important;
+        }
+
+        body {
+            top: 0px !important;
+            position: static !important;
+        }
+
+        .goog-text-highlight {
+            background-color: transparent !important;
+            box-shadow: none !important;
+        }
+
+        #google_translate_element {
+            display: none !important;
+        }
+    </style>
+
+
+</head>
+<body>
+    <!-- Interactive Blackbox.ai-style Orange Grid Background Canvas -->
+    <canvas id="interactiveGridCanvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0;"></canvas>
+
+    <!-- Hidden Google Translate Element -->
+    <div id="google_translate_element"></div>
+
+    <!-- Sticky Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{% url 'home' %}" class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <span>SafeGuard<small>AI</small></span>
+            </a>
+
+            <div class="nav-links" id="navLinks">
+                <a href="{% url 'home' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+                <a href="{% url 'tourist_spots' %}" class="nav-link {% if 'tourist-spots' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-gopuram"></i> Tourist Spots
+                </a>
+                <a href="{% url 'dashboard' %}" class="nav-link {% if 'dashboard' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </a>
+                <a href="{% url 'crime_map' %}" class="nav-link {% if 'crime-map' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-map-location-dot"></i> Heatmap
+                </a>
+                <a href="{% url 'nearest_police' %}" class="nav-link {% if 'nearest-police' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-building-shield"></i> Police Lookup
+                </a>
+                <a href="{% url 'live_risk_page' %}" class="nav-link {% if 'live-risk' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-brain"></i> AI Risk Check
+                </a>
+            </div>
+
+            <div class="nav-actions">
+                <!-- Real-Time UI Theme Switcher -->
+                <div style="position: relative; display: inline-block;">
+                    <select id="themeSelect" onchange="switchTheme(this.value)" style="background: rgba(15, 23, 42, 0.85); color: #ffffff; border: 1px solid var(--border-light); padding: 7px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; outline: none;">
+                        <option value="cyber">🌌 Midnight Cyber</option>
+                        <option value="orange">🟧 Neon Orange</option>
+                        <option value="sapphire">💎 Sapphire Ocean</option>
+                        <option value="emerald">🌿 Emerald Forest</option>
+                        <option value="light">☀️ Clean Light</option>
+                    </select>
+                </div>
+
+                <a href="{% url 'sos_alert' %}" class="btn-sos-nav">
+                    <i class="fa-solid fa-bell"></i> SOS Alert
+                </a>
+
+
+                <button class="mobile-toggle" id="mobileMenuBtn" aria-label="Toggle menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Body Container -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Floating AI Tourist Safety Assistant -->
+    <div id="aiChatWrapper" style="position: fixed; bottom: 25px; right: 25px; z-index: 9999;">
+        <!-- Chat Trigger Floating Button -->
+        <button id="aiChatToggle" class="btn btn-primary" style="width: 56px; height: 56px; border-radius: 50%; padding: 0; box-shadow: var(--shadow-glow-blue); font-size: 1.4rem; display: flex; align-items: center; justify-content: center;">
+            <i class="fa-solid fa-robot"></i>
+        </button>
+
+        <!-- Chat Modal Drawer -->
+        <div id="aiChatDrawer" class="glass-card" style="display: none; position: absolute; bottom: 70px; right: 0; width: 350px; max-width: 90vw; height: 460px; padding: 0; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow-glass); border-color: var(--border-glow);">
+            <!-- Header -->
+            <div style="background: rgba(15, 23, 42, 0.95); padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 32px; height: 32px; background: rgba(59,130,246,0.15); color: var(--accent-cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                        <i class="fa-solid fa-shield-cat"></i>
+                    </div>
+                    <div>
+                        <div style="font-family: var(--font-heading); font-weight: 700; font-size: 0.95rem; color: #ffffff;">SafeGuard AI Assistant</div>
+                        <div style="font-size: 0.7rem; color: var(--accent-emerald);"><i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> Active Safety Guide</div>
+                    </div>
+                </div>
+                <button id="aiChatClose" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Messages Container -->
+            <div id="aiChatMessages" style="flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem;">
+                <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.2); color: var(--text-main); padding: 10px 14px; border-radius: 12px 12px 12px 2px; align-self: flex-start; max-width: 85%;">
+                    Hello! I am your AI Safety Assistant. Ask me about nearby police stations, emergency helplines, travel tips, or location safety!
+                </div>
+            </div>
+
+            <!-- Quick Chips -->
+            <div style="padding: 6px 12px; background: rgba(15, 23, 42, 0.6); display: flex; gap: 6px; overflow-x: auto; border-top: 1px solid var(--border-light);">
+                <button class="chat-chip" onclick="sendQuickChat('Where is the nearest police station?')" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-light); color: var(--text-muted); padding: 4px 10px; border-radius: 50px; font-size: 0.72rem; white-space: nowrap; cursor: pointer;">🚔 Police</button>
+                <button class="chat-chip" onclick="sendQuickChat('What is the emergency helpline?')" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-light); color: var(--text-muted); padding: 4px 10px; border-radius: 50px; font-size: 0.72rem; white-space: nowrap; cursor: pointer;">🚨 Emergency</button>
+                <button class="chat-chip" onclick="sendQuickChat('Is it safe to travel at night?')" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-light); color: var(--text-muted); padding: 4px 10px; border-radius: 50px; font-size: 0.72rem; white-space: nowrap; cursor: pointer;">🌙 Night Safety</button>
+            </div>
+
+            <!-- Input Bar -->
+            <form id="aiChatForm" style="padding: 10px; background: rgba(15, 23, 42, 0.95); border-top: 1px solid var(--border-light); display: flex; gap: 8px;">
+                <input type="text" id="aiChatInput" class="form-control" placeholder="Type a safety question..." style="padding: 0.5rem 0.8rem; font-size: 0.85rem; border-radius: 8px;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.5rem 0.9rem; border-radius: 8px;">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <i class="fa-solid fa-shield-halved"></i> SafeGuard AI Tourist Protection
+            </div>
+            <div class="footer-text">
+                &copy; {% now "Y" %} Smart Tourist Safety Monitoring & Crime Risk Prediction System.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <!-- Custom JS with Cache-Busting -->
+    <script src="{% static 'scripts.js' %}?v=4.0"></script>
+
+
+    {% block extra_js %}{% endblock %}
+
+    <!-- Reset any translation cookies on load -->
+    <script type="text/javascript">
+        (function clearTranslations() {
+            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" + window.location.hostname + "; path=/;";
+            localStorage.removeItem('selectedAppLang');
+        })();
+    </script>
+
+
+
+
+    <script>
+        // AI Chatbot Interface JS
+        const chatToggle = document.getElementById('aiChatToggle');
+        const chatDrawer = document.getElementById('aiChatDrawer');
+        const chatClose = document.getElementById('aiChatClose');
+        const chatForm = document.getElementById('aiChatForm');
+        const chatInput = document.getElementById('aiChatInput');
+        const chatMessages = document.getElementById('aiChatMessages');
+
+        chatDrawer.style.display = 'none';
+
+        chatToggle.addEventListener('click', () => {
+            chatDrawer.style.display = chatDrawer.style.display === 'none' ? 'flex' : 'none';
+        });
+
+        chatClose.addEventListener('click', () => {
+            chatDrawer.style.display = 'none';
+        });
+
+        function appendMessage(text, isUser = false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.style.padding = '10px 14px';
+            msgDiv.style.borderRadius = isUser ? '12px 12px 2px 12px' : '12px 12px 12px 2px';
+            msgDiv.style.maxWidth = '85%';
+            msgDiv.style.lineHeight = '1.4';
+            
+            if (isUser) {
+                msgDiv.style.background = 'linear-gradient(135deg, var(--accent-blue), #2563eb)';
+                msgDiv.style.color = '#ffffff';
+                msgDiv.style.alignSelf = 'flex-end';
+            } else {
+                msgDiv.style.background = 'rgba(255, 255, 255, 0.07)';
+                msgDiv.style.border = '1px solid var(--border-light)';
+                msgDiv.style.color = 'var(--text-main)';
+                msgDiv.style.alignSelf = 'flex-start';
+            }
+
+            msgDiv.innerHTML = text;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function handleChatSubmit(prompt) {
+            if (!prompt) return;
+            appendMessage(prompt, true);
+
+            const currentLang = localStorage.getItem('selectedAppLang') || 'en';
+            fetch('/ai-chat/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: prompt, lang: currentLang })
+            })
+
+            .then(res => res.json())
+            .then(data => {
+                appendMessage(data.reply || 'Thank you. Keep your location broadcast enabled for safety.');
+            })
+            .catch(() => {
+                appendMessage('⚠️ Network connection issue. Please dial 112 directly for emergency help.');
+            });
+        }
+
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (text) {
+                chatInput.value = '';
+                handleChatSubmit(text);
+            }
+        });
+
+        function sendQuickChat(text) {
+            handleChatSubmit(text);
+        }
+    </script>
+</body>
+</html>

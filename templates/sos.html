@@ -1,181 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Emergency SOS</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #0a0f1e; --surface: #111827; --surface2: #1a2235;
-  --border: rgba(255,255,255,0.07); --border-md: rgba(255,255,255,0.13);
-  --text: #f0f4ff; --muted: #7a8aaa;
-  --accent-r: #ff3b5c; --accent-b: #3b82f6;
-  --radius: 12px; --radius-lg: 18px;
-  --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
-}
-html, body {
-  background: var(--bg); color: var(--text);
-  font-family: var(--font-body); min-height: 100vh;
-}
+{% extends "base.html" %}
 
-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 2rem; border-bottom: 1px solid var(--border);
-  background: rgba(10,15,30,0.9); backdrop-filter: blur(12px);
-  position: sticky; top: 0; z-index: 100;
-}
-.brand { font-family: var(--font-head); font-weight: 800; font-size: 1.05rem; }
-.brand span { color: var(--accent-b); }
-.back-link { font-size: 13px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color 0.2s; }
-.back-link:hover { color: var(--text); }
+{% block title %}Emergency SOS Alert - SafeGuard AI{% endblock %}
 
-.page { padding: 3rem 1.5rem; max-width: 520px; margin: 0 auto; }
-
-.sos-header { text-align: center; margin-bottom: 2.5rem; }
-.sos-pulse {
-  width: 80px; height: 80px; border-radius: 50%;
-  background: rgba(255,59,92,0.15); border: 2px solid rgba(255,59,92,0.4);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 36px; margin: 0 auto 1.5rem;
-  animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255,59,92,0.3); }
-  50% { box-shadow: 0 0 0 14px rgba(255,59,92,0); }
-}
-h1 { font-family: var(--font-head); font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
-.sub { color: var(--muted); font-size: 14px; max-width: 360px; margin: 0 auto; line-height: 1.6; }
-
-.form-card {
-  background: var(--surface); border: 1px solid rgba(255,59,92,0.15);
-  border-radius: var(--radius-lg); padding: 2rem;
-  box-shadow: 0 0 40px rgba(255,59,92,0.05);
-}
-.fields { display: flex; flex-direction: column; gap: 1.25rem; }
-.field { display: flex; flex-direction: column; gap: 7px; }
-.label {
-  font-size: 11px; font-weight: 500; letter-spacing: 0.07em;
-  text-transform: uppercase; color: var(--muted);
-}
-.input {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: var(--radius); color: var(--text);
-  font-family: var(--font-body); font-size: 14px;
-  padding: 11px 14px; outline: none; width: 100%;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.input:focus { border-color: var(--accent-r); box-shadow: 0 0 0 3px rgba(255,59,92,0.12); }
-.input::placeholder { color: var(--muted); }
-.input[readonly] { color: var(--muted); cursor: default; }
-.input[readonly]:focus { border-color: var(--border); box-shadow: none; }
-
-.loc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.loc-hint { font-size: 12px; color: var(--muted); margin-top: 3px; }
-
-.btn-location {
-  padding: 10px 14px; border-radius: var(--radius);
-  background: var(--surface2); color: var(--text);
-  border: 1px solid var(--border-md); font-family: var(--font-body);
-  font-size: 13px; cursor: pointer; transition: background 0.2s;
-  display: flex; align-items: center; gap: 6px;
-  width: 100%;
-}
-.btn-location:hover { background: #222e45; }
-
-.btn-sos {
-  width: 100%; padding: 16px; margin-top: 0.25rem;
-  background: var(--accent-r); color: #fff;
-  border: none; border-radius: var(--radius);
-  font-family: var(--font-head); font-size: 1.1rem; font-weight: 700;
-  letter-spacing: 0.05em; cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.btn-sos:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,59,92,0.3); }
-.btn-sos:active { transform: translateY(0); }
-
-.divider { height: 1px; background: var(--border); margin: 0.75rem 0; }
-
-.loc-status { font-size: 12px; color: var(--muted); text-align: center; min-height: 16px; }
-.loc-status.ok { color: #4ade80; }
-.loc-status.err { color: var(--accent-r); }
-</style>
-</head>
-<body>
-
-<nav>
-  <div class="brand">🌍 Tourist<span>Safe</span></div>
-  <a href="/" class="back-link">← Home</a>
-</nav>
-
-<div class="page">
-  <div class="sos-header">
-    <div class="sos-pulse">🚨</div>
-    <h1>Emergency SOS</h1>
-    <p class="sub">Send an instant alert with your GPS coordinates to local emergency services.</p>
-  </div>
-
-  <div class="form-card">
-    <form method="POST">
-      {% csrf_token %}
-      <div class="fields">
-        <div class="field">
-          <label class="label" for="user">Your Name</label>
-          <input class="input" type="text" id="user" name="user" placeholder="Full name as registered" required>
+{% block content %}
+<div style="max-width: 580px; margin: 1.5rem auto;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <div style="width: 80px; height: 80px; background: rgba(239,68,68,0.15); border: 2px solid rgba(239,68,68,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: var(--accent-red); margin: 0 auto 1.25rem; animation: pulseGlow 1.5s infinite;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
+        <h1 class="page-title" style="font-size: 2.2rem;">Emergency SOS Alert</h1>
+        <p class="page-subtitle">Send an instant alert with your live GPS location directly to local emergency authorities.</p>
+    </div>
 
-        <div class="divider"></div>
-
-        <div class="field">
-          <label class="label">Your GPS Location</label>
-          <button type="button" class="btn-location" onclick="getLocation()">
-            📍 Detect My Location
-          </button>
-          <p class="loc-status" id="loc-status">Location not yet detected</p>
+    <!-- Quick Emergency Call Helplines -->
+    <div style="margin-bottom: 2rem;">
+        <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 10px; text-align: center;">
+            <i class="fa-solid fa-phone-volume" style="color: var(--accent-red);"></i> 1-Touch Emergency Speed-Dial
         </div>
-
-        <div class="loc-row">
-          <div class="field">
-            <label class="label" for="latitude">Latitude</label>
-            <input class="input" type="text" id="latitude" name="latitude" placeholder="—" readonly>
-          </div>
-          <div class="field">
-            <label class="label" for="longitude">Longitude</label>
-            <input class="input" type="text" id="longitude" name="longitude" placeholder="—" readonly>
-          </div>
+        <div class="grid-4" style="grid-template-columns: repeat(4, 1fr); gap: 8px;">
+            <a href="tel:112" class="glass-card" style="padding: 10px; text-align: center; text-decoration: none; border-color: rgba(239,68,68,0.3);">
+                <div style="font-size: 1.1rem; font-weight: 800; color: var(--accent-red);">112</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">National SOS</div>
+            </a>
+            <a href="tel:100" class="glass-card" style="padding: 10px; text-align: center; text-decoration: none; border-color: rgba(59,130,246,0.3);">
+                <div style="font-size: 1.1rem; font-weight: 800; color: var(--accent-blue);">100</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">Police Control</div>
+            </a>
+            <a href="tel:108" class="glass-card" style="padding: 10px; text-align: center; text-decoration: none; border-color: rgba(16,185,129,0.3);">
+                <div style="font-size: 1.1rem; font-weight: 800; color: var(--accent-emerald);">108</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">Ambulance</div>
+            </a>
+            <a href="tel:1091" class="glass-card" style="padding: 10px; text-align: center; text-decoration: none; border-color: rgba(245,158,11,0.3);">
+                <div style="font-size: 1.1rem; font-weight: 800; color: var(--accent-amber);">1091</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">Women Safety</div>
+            </a>
         </div>
+    </div>
 
-        <button type="submit" class="btn-sos">
-          🚨 SEND SOS ALERT
-        </button>
-      </div>
-    </form>
-  </div>
+    <div class="glass-card sos-card-accent" style="padding: 2rem;">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label" for="user"><i class="fa-solid fa-user"></i> Full Name / Tourist ID</label>
+                <input type="text" class="form-control" id="user" name="user" placeholder="Enter your full registered name" required>
+            </div>
+
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <label class="form-label"><i class="fa-solid fa-location-crosshairs"></i> Your GPS Coordinates</label>
+                <button type="button" class="btn btn-outline" style="width: 100%; margin-bottom: 8px;" onclick="getCurrentLocation('latitude', 'longitude', 'loc-status')">
+                    <i class="fa-solid fa-location-arrow"></i> Detect My Current GPS Location
+                </button>
+                <p id="loc-status" style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-bottom: 12px;"></p>
+            </div>
+
+            <div class="grid-2" style="grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem;">
+                <div>
+                    <label class="form-label" for="latitude">Latitude</label>
+                    <input type="text" class="form-control" id="latitude" name="latitude" placeholder="Lat" readonly required>
+                </div>
+                <div>
+                    <label class="form-label" for="longitude">Longitude</label>
+                    <input type="text" class="form-control" id="longitude" name="longitude" placeholder="Lng" readonly required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-danger" style="width: 100%; padding: 1rem; font-size: 1.1rem; font-family: var(--font-heading);">
+                <i class="fa-solid fa-bell"></i> TRANSMIT EMERGENCY SOS
+            </button>
+        </form>
+    </div>
 </div>
-
-<script>
-function getLocation() {
-  var statusEl = document.getElementById('loc-status');
-  statusEl.textContent = 'Detecting location…';
-  statusEl.className = 'loc-status';
-
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      document.getElementById("latitude").value = position.coords.latitude;
-      document.getElementById("longitude").value = position.coords.longitude;
-      statusEl.textContent = '✔ Location detected — ' + position.coords.latitude.toFixed(5) + ', ' + position.coords.longitude.toFixed(5);
-      statusEl.className = 'loc-status ok';
-    }, function() {
-      statusEl.textContent = '✘ Could not access location. Please enable GPS.';
-      statusEl.className = 'loc-status err';
-    });
-  } else {
-    statusEl.textContent = '✘ Geolocation is not supported by this browser.';
-    statusEl.className = 'loc-status err';
-  }
-}
-</script>
-</body>
-</html>
+{% endblock %}
