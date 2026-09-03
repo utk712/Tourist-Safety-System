@@ -11,3 +11,4 @@ services:
         value: "*"
       - key: DEBUG
         value: "False"
+
